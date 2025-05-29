@@ -1,55 +1,50 @@
-// controllers/clientController.js
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+// src/controllers/clientController.js
+const prisma = require('../config/db');
 
 /**
- * Retorna os pontos de um cliente num estabelecimento (usando Prisma)
- * @param {string} phone
- * @param {string|number} establishmentId
- * @returns {Promise<number|null>}
+ * POST /api/clients/check-points
+ * Retorna pontos de um cliente por telefone e estabelecimento
  */
-const getPoints = async (phone, establishmentId) => {
-  const estId = parseInt(establishmentId, 10);
-  const client = await prisma.client.findFirst({
-    where: { phone, establishmentId: estId },
-    select: { points: true },
-  });
-  return client ? client.points : null;
-};
-
-/**
- * Controller para o endpoint POST /api/clients/check-points
- */
-const checkPoints = async (req, res, next) => {
+exports.checkPoints = async (req, res, next) => {
   try {
     const { phone, establishmentId } = req.body;
-
     if (!phone || !establishmentId) {
       return res
         .status(400)
         .json({ message: 'phone e establishmentId são obrigatórios' });
     }
 
-    const points = await getPoints(phone, establishmentId);
+    const estId = parseInt(establishmentId, 10);
+    const client = await prisma.client.findFirst({
+      where: { phone, establishmentId: estId },
+      select: { points: true },
+    });
 
-    if (points === null) {
+    if (!client) {
       return res
         .status(404)
         .json({ message: 'Cliente não encontrado neste estabelecimento.' });
     }
 
-    return res.json({ points });
+    res.json({ points: client.points });
   } catch (error) {
     next(error);
   }
 };
 
-const listClients = async (req, res, next) => {
-  const establishmentId = parseInt(req.query.establishmentId, 10);
-  if (!establishmentId) {
-    return res.status(400).json({ message: 'EstablishmentId é obrigatório' });
-  }
+/**
+ * GET /api/clients?establishmentId=#
+ * Lista todos os clientes de um estabelecimento
+ */
+exports.listClients = async (req, res, next) => {
   try {
+    const establishmentId = parseInt(req.query.establishmentId, 10);
+    if (!establishmentId) {
+      return res
+        .status(400)
+        .json({ message: 'EstablishmentId é obrigatório' });
+    }
+
     const clients = await prisma.client.findMany({
       where: { establishmentId },
     });
@@ -59,24 +54,27 @@ const listClients = async (req, res, next) => {
   }
 };
 
-const createClient = async (req, res, next) => {
-  const { fullName, phone, email, points, establishmentId } = req.body;
-  const establishmentIdNumber = parseInt(establishmentId, 10);
-
-  if (!fullName || !phone || !establishmentIdNumber) {
-    return res
-      .status(400)
-      .json({ message: 'fullName, phone e establishmentId são obrigatórios' });
-  }
-
+/**
+ * POST /api/clients
+ * Cria um novo cliente
+ */
+exports.createClient = async (req, res, next) => {
   try {
+    const { fullName, phone, email, points, establishmentId } = req.body;
+    const estId = parseInt(establishmentId, 10);
+    if (!fullName || !phone || !estId) {
+      return res
+        .status(400)
+        .json({ message: 'fullName, phone e establishmentId são obrigatórios' });
+    }
+
     const newClient = await prisma.client.create({
       data: {
         fullName,
         phone,
         email,
         points: points || 0,
-        establishmentId: establishmentIdNumber,
+        establishmentId: estId,
       },
     });
     res.status(201).json(newClient);
@@ -85,18 +83,22 @@ const createClient = async (req, res, next) => {
   }
 };
 
-const updateClient = async (req, res, next) => {
-  const clientId = parseInt(req.params.id, 10);
-  const { fullName, phone, email, points, establishmentId } = req.body;
-  const establishmentIdNumber = parseInt(establishmentId, 10);
-
-  if (!fullName || !phone || !establishmentIdNumber) {
-    return res
-      .status(400)
-      .json({ message: 'fullName, phone e establishmentId são obrigatórios' });
-  }
-
+/**
+ * PUT /api/clients/:id
+ * Atualiza dados de um cliente
+ */
+exports.updateClient = async (req, res, next) => {
   try {
+    const clientId = parseInt(req.params.id, 10);
+    const { fullName, phone, email, points, establishmentId } = req.body;
+    const estId = parseInt(establishmentId, 10);
+
+    if (!fullName || !phone || !estId) {
+      return res
+        .status(400)
+        .json({ message: 'fullName, phone e establishmentId são obrigatórios' });
+    }
+
     const updatedClient = await prisma.client.update({
       where: { id: clientId },
       data: {
@@ -104,7 +106,7 @@ const updateClient = async (req, res, next) => {
         phone,
         email,
         points,
-        establishmentId: establishmentIdNumber,
+        establishmentId: estId,
       },
     });
     res.json({ message: 'Cliente atualizado', client: updatedClient });
@@ -113,13 +115,20 @@ const updateClient = async (req, res, next) => {
   }
 };
 
-const deleteClient = async (req, res, next) => {
-  const clientId = parseInt(req.params.id, 10);
-  const establishmentId = parseInt(req.query.establishmentId, 10);
-  if (!establishmentId) {
-    return res.status(400).json({ message: 'EstablishmentId é obrigatório' });
-  }
+/**
+ * DELETE /api/clients/:id?establishmentId=#
+ * Exclui um cliente
+ */
+exports.deleteClient = async (req, res, next) => {
   try {
+    const clientId = parseInt(req.params.id, 10);
+    const estId     = parseInt(req.query.establishmentId, 10);
+    if (!estId) {
+      return res
+        .status(400)
+        .json({ message: 'EstablishmentId é obrigatório' });
+    }
+
     await prisma.client.delete({ where: { id: clientId } });
     res.json({ message: 'Cliente excluído' });
   } catch (error) {
@@ -127,20 +136,28 @@ const deleteClient = async (req, res, next) => {
   }
 };
 
-const addPoints = async (req, res, next) => {
-  const clientId = parseInt(req.params.id, 10);
-  const { pointsToAdd, establishmentId } = req.body;
-  const establishmentIdNumber = parseInt(establishmentId, 10);
-  if (!establishmentIdNumber) {
-    return res.status(400).json({ message: 'EstablishmentId é obrigatório' });
-  }
+/**
+ * POST /api/clients/:id/points
+ * Adiciona pontos a um cliente
+ */
+exports.addPoints = async (req, res, next) => {
   try {
+    const clientId = parseInt(req.params.id, 10);
+    const { pointsToAdd, establishmentId } = req.body;
+    const estId = parseInt(establishmentId, 10);
+    if (!estId) {
+      return res
+        .status(400)
+        .json({ message: 'EstablishmentId é obrigatório' });
+    }
+
     const client = await prisma.client.findUnique({ where: { id: clientId } });
-    if (!client || client.establishmentId !== establishmentIdNumber) {
+    if (!client || client.establishmentId !== estId) {
       return res
         .status(404)
         .json({ message: 'Cliente não encontrado para este estabelecimento' });
     }
+
     const updatedClient = await prisma.client.update({
       where: { id: clientId },
       data: { points: client.points + pointsToAdd },
@@ -151,20 +168,28 @@ const addPoints = async (req, res, next) => {
   }
 };
 
-const resetClientPoints = async (req, res, next) => {
-  const clientId = parseInt(req.params.id, 10);
-  const { establishmentId } = req.body;
-  const establishmentIdNumber = parseInt(establishmentId, 10);
-  if (!establishmentIdNumber) {
-    return res.status(400).json({ message: 'EstablishmentId é obrigatório' });
-  }
+/**
+ * PUT /api/clients/:id/reset
+ * Zera os pontos do cliente
+ */
+exports.resetClientPoints = async (req, res, next) => {
   try {
+    const clientId = parseInt(req.params.id, 10);
+    const { establishmentId } = req.body;
+    const estId = parseInt(establishmentId, 10);
+    if (!estId) {
+      return res
+        .status(400)
+        .json({ message: 'EstablishmentId é obrigatório' });
+    }
+
     const client = await prisma.client.findUnique({ where: { id: clientId } });
-    if (!client || client.establishmentId !== establishmentIdNumber) {
+    if (!client || client.establishmentId !== estId) {
       return res
         .status(404)
         .json({ message: 'Cliente não encontrado para este estabelecimento' });
     }
+
     const updatedClient = await prisma.client.update({
       where: { id: clientId },
       data: { points: 0 },
@@ -173,52 +198,4 @@ const resetClientPoints = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-const sendVoucherAndResetPoints = async (req, res, next) => {
-  const clientId = parseInt(req.params.id, 10);
-  const { establishmentId } = req.body;
-  const establishmentIdNumber = parseInt(establishmentId, 10);
-  if (!establishmentIdNumber) {
-    return res.status(400).json({ message: 'EstablishmentId é obrigatório' });
-  }
-  try {
-    const establishment = await prisma.establishment.findUnique({
-      where: { id: establishmentIdNumber },
-      select: { voucherMessage: true },
-    });
-    const voucherMessage =
-      establishment?.voucherMessage ||
-      `Parabéns! Você ganhou um voucher exclusivo do estabelecimento ${establishmentIdNumber}!`;
-
-    const client = await prisma.client.findUnique({ where: { id: clientId } });
-    if (!client || client.establishmentId !== establishmentIdNumber) {
-      return res
-        .status(404)
-        .json({ message: 'Cliente não encontrado para este estabelecimento' });
-    }
-    const updatedClient = await prisma.client.update({
-      where: { id: clientId },
-      data: { points: 0 },
-    });
-    res.json({
-      message: 'Voucher enviado e pontos zerados com sucesso.',
-      voucherMessage,
-      client: updatedClient,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-module.exports = {
-  checkPoints,
-  getPoints,
-  listClients,
-  createClient,
-  updateClient,
-  deleteClient,
-  addPoints,
-  resetClientPoints,
-  sendVoucherAndResetPoints,
 };

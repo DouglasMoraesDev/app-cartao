@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Consultar Pontos</title>
 
-  <!-- Barra de status para Android/Chrome -->
+  <!-- 1) Barra de status para Android/Chrome -->
   <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
 
-  <!-- Google Fonts -->
+  <!-- 2) Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -16,13 +16,20 @@
     rel="stylesheet"
   />
 
-  <!-- CSS global de variáveis -->
-  <link rel="stylesheet" href="/app.css" />
+  <!-- 3) CSS global (caminho corrigido para /css/style.css) -->
+  <link rel="stylesheet" href="/css/style.css" />
 
   <style>
-    /* RESET & LAYOUT BASE */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
+    /* ======== RESET & LAYOUT BASE ======== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html,
+    body {
+      height: 100%;
+    }
     body {
       display: flex;
       align-items: center;
@@ -33,7 +40,7 @@
       padding: 1rem;
     }
 
-    /* CONTAINER PRINCIPAL */
+    /* ======== CONTAINER PRINCIPAL ======== */
     .points-container {
       background-color: var(--container-bg);
       padding: 2rem;
@@ -56,7 +63,7 @@
     }
     .points-container header img {
       max-width: 120px;
-      display: none; /* será exibido via JS quando houver logo */
+      display: none; /* será exibido via JS se houver logo */
     }
     .points-container header h1 {
       color: var(--primary-color);
@@ -92,11 +99,44 @@
       transform: translateY(-2px);
     }
 
-    /* RESULTADO */
-    #result {
-      font-size: 1.2rem;
-      font-weight: bold;
-      min-height: 1.2em;
+    /* RESULTADO (o cartão virtual) */
+    .card-wrapper {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+    }
+    .virtual-card {
+      background: var(--primary-color);
+      border: 2px solid var(--secondary-color);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 300px;
+      padding: 1rem;
+      text-align: center;
+      color: var(--text-color);
+      box-shadow: var(--box-shadow);
+    }
+    .virtual-card h2 {
+      margin-bottom: 0.75rem;
+      font-size: 1.25rem;
+      color: var(--header-bg);
+    }
+    .stamps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+      gap: 0.25rem;
+      justify-items: center;
+      margin-top: 0.75rem;
+    }
+    .stamps img {
+      width: 40px;
+      height: 40px;
+      opacity: 0.8;
+    }
+    .no-points {
+      margin-top: 1rem;
+      color: var(--secondary-color);
+      font-weight: 500;
     }
 
     /* RESPONSIVIDADE */
@@ -112,11 +152,20 @@
         font-size: 0.9rem;
         padding: 0.65rem;
       }
-      #result {
-        font-size: 1.1rem;
+      .virtual-card {
+        padding: 0.75rem;
+      }
+      .stamps img {
+        width: 30px;
+        height: 30px;
       }
     }
   </style>
+
+  <!-- 4) Importar api.js PARA DEFINIR API_URL, antes de points.js -->
+  <script src="/js/api.js" defer></script>
+  <!-- 5) Importar o points.js (usa API_URL) -->
+  <script src="/js/points.js" defer></script>
 </head>
 <body>
   <div class="points-container">
@@ -135,9 +184,10 @@
       <button type="submit">Ver Pontos</button>
     </form>
 
-    <div id="result"></div>
+    <!-- Aqui exibiremos o resultado como um "cartão virtual" -->
+    <div class="card-wrapper">
+      <div id="cardContainer"></div>
+    </div>
   </div>
-
-  <script src="points.js"></script>
 </body>
 </html>

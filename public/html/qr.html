@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- meta theme-color -->
+  <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartão Fidelidade – Consultar Pontos</title>
+
+  <!-- Manifest e ícones -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/logo/icon.png" sizes="192x192" />
+  <link rel="icon" href="/logo/icon.png" sizes="512x512" />
+  <link rel="apple-touch-icon" href="/logo/icon.png" sizes="180x180" />
+  <link rel="shortcut icon" href="/logo/icon.png" />
+
+  <!-- CSS global -->
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Fontes Google -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&amp;family=Oxanium:wght@200..800&amp;display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Scripts -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/theme.js" defer></script>
+  <script src="/js/qr.js" defer></script>
+</head>
+<body>
+  <!-- ======== Header e Menu ======== -->
+  <div class="dashboard-container header-container">
+    <div>
+      <h1 id="est-name">Cartão Fidelidade</h1>
+    </div>
+    <!-- id="est-logo" será preenchido em theme.js -->
+    <img id="est-logo" src="" alt="Logo do Estabelecimento" style="display: none;" />
+  </div>
+
+  <!-- ======== Conteúdo “Consultar Pontos” ======== -->
+  <div class="dashboard-container">
+    <h3>QR Code para consulta de pontos</h3>
+    <img id="qrCodeImg" alt="QR Code do estabelecimento" />
+    <p>
+      Ou abra diretamente:
+      <a id="pointsLink" href="#" target="_blank"
+        >Consultar meus pontos</a
+      >
+    </p>
+  </div>
+
+  <footer>
+    <p>
+      &copy; Douglas Moraes Dev<br />
+      <a href="https://wa.me/qr/F2Z744R5KWEPB1" target="_blank"
+        >Contato</a
+      >
+    </p>
+  </footer>
+
+  <!-- Atenção: este trecho abaixo (IIFE) faz a lógica de theme e fetch no momento do carregamento -->
+  <!-- Mantivemos exatamente o script que você colou no final (sem alterações de lógica) -->
+  <script>
+    (async () => {
+      // 1. Pega o establishmentId da URL
+      const params = new URLSearchParams(window.location.search);
+      const estId = params.get('establishmentId');
+      if (!estId) {
+        alert('ID do estabelecimento não informado na URL');
+        return;
+      }
+
+      // 2. Busca dados de tema + logo
+      let est;
+      try {
+        const res = await fetch(`/api/establishments/${estId}`);
+        if (!res.ok) throw new Error('Estabelecimento não encontrado');
+        est = await res.json();
+        console.log('Tema recebido →', est);
+      } catch (err) {
+        console.error(err);
+        return;
+      }
+
+      // 3. Atualiza meta theme-color (barra de status Android/Chrome)
+      const meta = document.getElementById('theme-color-meta');
+      if (meta && est.backgroundColor) {
+        meta.setAttribute('content', est.backgroundColor);
+      }
+
+      // 4. Mapeia e aplica variáveis CSS
+      const varsMap = {
+        '--primary-color':     est.primaryColor,
+        '--secondary-color':   est.secondaryColor,
+        '--background-color':  est.backgroundColor,
+        '--container-bg':      est.containerBg,
+        '--text-color':        est.textColor,
+        '--header-bg':         est.headerBg,
+        '--footer-bg':         est.footerBg,
+        '--footer-text':       est.footerText,
+        '--input-border':      est.inputBorder,
+        '--button-bg':         est.buttonBg,
+        '--button-text':      est.buttonText,
+        '--box-shadow':        est.boxShadow || '0 4px 6px rgba(0,0,0,0.1)',
+        '--transition-speed':  est.transitionSpeed || '0.3s'
+      };
+      const root = document.documentElement;
+      Object.entries(varsMap).forEach(([k, v]) => {
+        if (v) root.style.setProperty(k, v);
+      });
+
+      // 5. Insere logo e nome
+      const logoEl = document.getElementById('est-logo');
+      if (est.logoURL) {
+        // normaliza caminho removendo "./"
+        const path = est.logoURL.replace(/^\.\//, '');
+        logoEl.src = `${window.location.origin}/${path}`;
+        logoEl.style.display = 'block';
+      }
+      document.getElementById('est-name').textContent = est.name;
+
+      // 6. Hook do form para buscar pontos (página points.html)
+      document.getElementById('pointsForm')?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const phone = document.getElementById('phone').value.trim();
+        const out = document.getElementById('result');
+
+        try {
+          const r2 = await fetch('/api/clients/check-points', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, establishmentId: estId })
+          });
+          const data2 = await r2.json();
+          if (!r2.ok) throw new Error(data2.message || 'Erro');
+          out.innerText = `Você tem ${data2.points} ponto(s).`;
+        } catch (err) {
+          out.innerText = err.message || 'Erro ao buscar pontos.';
+        }
+      });
+
+      // 7. Renderiza o QR Code e prepara o link direto
+      renderQRCode(estId);
+    })();
+  </script>
+</body>
+</html>

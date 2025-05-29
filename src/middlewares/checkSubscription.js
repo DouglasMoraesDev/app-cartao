@@ -1,20 +1,15 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
+// src/middlewares/checkSubscription.js
+const prisma = require('../config/db');
 const DAYS_28_MS = 28 * 24 * 60 * 60 * 1000;
 
 exports.checkSubscription = async (req, res, next) => {
   try {
-    // pega establishmentId do token (req.user), ou da rota, se preferir
-    const establishmentId = req.user.establishmentId;
     const est = await prisma.establishment.findUnique({
-      where: { id: establishmentId },
+      where: { id: req.user.establishmentId },
       select: { lastPaymentDate: true }
     });
-    const paymentDate = est?.lastPaymentDate;
-    const now = Date.now();
-    if (!paymentDate || (now - new Date(paymentDate).getTime()) > DAYS_28_MS) {
-      // 402 = Payment Required
+    const last = est?.lastPaymentDate;
+    if (!last || (Date.now() - new Date(last).getTime()) > DAYS_28_MS) {
       return res
         .status(402)
         .json({ message: 'Assinatura expirada. Por favor, renove seu plano.' });

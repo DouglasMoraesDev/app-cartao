@@ -1,14 +1,9 @@
-// routes/adminRoutes.js
-const express = require('express');
-const router = express.Router();
-const {
-  listEstablishments,
-  updateEstablishment,
-  deleteEstablishment
-} = require('../controllers/adminController');
+// src/routes/adminRoutes.js
+const router  = require('express').Router();
+const ctrl    = require('../controllers/adminController');
 
-router.get('/establishments', listEstablishments);
-router.put('/establishments/:id', updateEstablishment);
-router.delete('/establishments/:id', deleteEstablishment);
+router.get('/',      ctrl.listEstablishments);
+router.put('/:id',   ctrl.updateEstablishment);
+router.delete('/:id',ctrl.deleteEstablishment);
 
 module.exports = router;

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartão Fidelidade – Dashboard</title>
+
+  <!-- Mesmos links do login.html -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/logo/icon.png" sizes="192x192" />
+  <link rel="icon" href="/logo/icon.png" sizes="512x512" />
+  <link rel="apple-touch-icon" href="/logo/icon.png" sizes="180x180" />
+  <link rel="shortcut icon" href="/logo/icon.png" />
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&amp;family=Oxanium:wght@200..800&amp;display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Scripts comuns e específicos -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/dashboard.js" defer></script>
+</head>
+<body>
+  <!-- ====== Apenas o Dashboard (sem o loginDiv) ====== -->
+  <div id="dashboard">
+    <!-- HEADER e boas-vindas -->
+    <div class="dashboard-container header-container">
+      <div>
+        <h1>Cartão Fidelidade</h1>
+        <p id="welcome-msg">Olá, seja bem-vindo de volta, <span id="user-name"></span>!</p>
+      </div>
+      <img id="logo" src="/logo/LogoGuerra.png" alt="Logo do estabelecimento" />
+    </div>
+
+    <!-- MENU DE ABAS -->
+    <nav class="tab-menu">
+      <a href="clients.html"><button>👤 Cadastrar Cliente</button></a>
+      <a href="addPoints.html"><button>➕ Adicionar Pontos</button></a>
+      <a href="clientsTable.html"><button>📋 Tabela Clientes</button></a>
+      <a href="notifications.html"><button>🔔 Notificações</button></a>
+      <a href="qr.html"><button>📷 Consultar Pontos</button></a>
+      <button id="logoutBtn" class="logout-btn">Sair</button>
+    </nav>
+
+    <!-- Aqui poderíamos incluir, logo abaixo, um “<div id="content"></div>” caso
+         queiramos dinamicamente injetar conteúdo, mas a ideia geral é:
+         cada aba agora virou uma página diferente. -->
+  </div>
+
+  <footer>
+    <p>&copy; Douglas Moraes Dev<br /><a href="https://wa.me/qr/F2Z744R5KWEPB1" target="_blank">Contato</a></p>
+  </footer>
+</body>
+</html>

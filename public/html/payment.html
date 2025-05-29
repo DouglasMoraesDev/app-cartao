@@ -3,6 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <title>Renove sua assinatura</title>
+
+  <!-- 1) META para theme-color, com id para eventuais scripts alterarem dinamicamente -->
+  <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 2) Manifest e ícones -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/logo/icon.png" sizes="192x192" />
+  <link rel="icon" href="/logo/icon.png" sizes="512x512" />
+  <link rel="apple-touch-icon" href="/logo/icon.png" sizes="180x180" />
+  <link rel="shortcut icon" href="/logo/icon.png" />
+
+  <!-- 3) CSS global (mantemos seu estilo inline abaixo, mas garantimos que /css/style.css esteja carregado) -->
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- 4) Fontes Google (Montserrat) -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- 5) Se houver lógica de redirecionamento ou verificações de assinatura, importa api.js -->
+  <script src="/js/api.js" defer></script>
+  <!-- Se você tiver um JS específico para processar o pagamento, importe aqui (opcional) -->
+  <!-- <script src="/js/subscription.js" defer></script> -->
+
+  <!-- 6) Seu estilo inline original continua aqui -->
   <style>
     /* Reset mínimo */
     *, *::before, *::after {

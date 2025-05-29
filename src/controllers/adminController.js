@@ -1,18 +1,21 @@
-// controllers/adminController.js
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+// src/controllers/adminController.js
+const prisma = require('../config/db');
 
 /**
+ * GET /api/admin/establishments
  * Lista todos os estabelecimentos
  */
 exports.listEstablishments = async (_, res, next) => {
   try {
     const list = await prisma.establishment.findMany();
     res.json(list);
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 };
 
 /**
+ * PUT /api/admin/establishments/:id
  * Atualiza tema e lastPaymentDate de um estabelecimento
  */
 exports.updateEstablishment = async (req, res, next) => {
@@ -31,17 +34,24 @@ exports.updateEstablishment = async (req, res, next) => {
       buttonBg:        req.body.buttonBg,
       buttonText:      req.body.buttonText,
       voucherMessage:  req.body.voucherMessage,
-      lastPaymentDate: new Date(req.body.lastPaymentDate),
+      lastPaymentDate: req.body.lastPaymentDate
+        ? new Date(req.body.lastPaymentDate)
+        : null,
     };
+
     const updated = await prisma.establishment.update({
       where: { id },
       data,
     });
+
     res.json(updated);
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 };
 
 /**
+ * DELETE /api/admin/establishments/:id
  * Exclui um estabelecimento
  */
 exports.deleteEstablishment = async (req, res, next) => {
@@ -49,5 +59,7 @@ exports.deleteEstablishment = async (req, res, next) => {
     const id = parseInt(req.params.id, 10);
     await prisma.establishment.delete({ where: { id } });
     res.json({ message: 'Estabelecimento removido' });
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 };

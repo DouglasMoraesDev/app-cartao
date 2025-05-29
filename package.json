@@ -1,0 +1,34 @@
+{
+  "name": "app-cartao",
+  "version": "1.0.0",
+  "description": "Sistema de cartão fidelidade — backend em Node.js + Prisma, frontend estático em /public",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init"
+  },
+  "keywords": [
+    "fidelidade",
+    "prisma",
+    "mysql",
+    "express",
+    "nodejs"
+  ],
+  "author": "Seu Nome",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^4.10.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "qrcode": "^1.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22",
+    "prisma": "^4.10.1"
+  }
+}

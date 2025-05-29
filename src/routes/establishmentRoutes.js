@@ -1,16 +1,10 @@
-const express = require('express');
-const router = express.Router();
-const {
-  getEstablishmentById,
-  getVoucherMessage,
-  getQRCode
-} = require('../controllers/establishmentController');
+// src/routes/establishmentRoutes.js
+const router = require('express').Router();
+const ctrl   = require('../controllers/establishmentController');
 
-// QR Code
-router.get('/:id/qrcode', getQRCode);
-
-// Dados do estabelecimento e mensagem de voucher
-router.get('/:id', getEstablishmentById);
-router.get('/:id/voucher-message', getVoucherMessage);
+// QR Code e dados de estabelecimento
+router.get('/:id/qrcode',           ctrl.getQRCode);
+router.get('/:id/voucher-message',  ctrl.getVoucherMessage);
+router.get('/:id',                  ctrl.getEstablishmentById);
 
 module.exports = router;

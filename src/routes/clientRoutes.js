@@ -1,14 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const clientController = require('../controllers/clientController');
+// src/routes/clientRoutes.js
+const router = require('express').Router();
+const ctrl   = require('../controllers/clientController');
 
-router.get('/', clientController.listClients);
-router.post('/', clientController.createClient);
-router.put('/:id', clientController.updateClient);
-router.delete('/:id', clientController.deleteClient);
-router.post('/:id/points', clientController.addPoints);
-router.put('/:id/reset', clientController.resetClientPoints);
-router.put('/:id/send-voucher', clientController.sendVoucherAndResetPoints);
-router.post('/check-points', clientController.checkPoints);
+// CRUD clientes + pontos + check-points
+router.post('/check-points', ctrl.checkPoints);
+router.get('/',              ctrl.listClients);
+router.post('/',             ctrl.createClient);
+router.put('/:id',           ctrl.updateClient);
+router.delete('/:id',        ctrl.deleteClient);
+router.post('/:id/points',   ctrl.addPoints);
+router.put('/:id/reset',     ctrl.resetClientPoints);
 
 module.exports = router;

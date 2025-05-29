@@ -1,10 +1,8 @@
-// routes/userRoutes.js
-const express = require('express');
-const router = express.Router();
-const userController = require('../controllers/userController');
+// src/routes/userRoutes.js
+const router = require('express').Router();
+const { login } = require('../controllers/userController');
 
-// Rota de login: /api/login
-router.post('/login', userController.login);
+// Rota de login
+router.post('/', login);
 
 module.exports = router;
-

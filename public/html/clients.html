@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- meta theme-color para aplicar cores dinâmicas -->
+  <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartão Fidelidade – Cadastrar Cliente</title>
+
+  <!-- Manifest e ícones -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/logo/icon.png" sizes="192x192" />
+  <link rel="icon" href="/logo/icon.png" sizes="512x512" />
+  <link rel="apple-touch-icon" href="/logo/icon.png" sizes="180x180" />
+  <link rel="shortcut icon" href="/logo/icon.png" />
+
+  <!-- CSS global -->
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Fontes Google -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&amp;family=Oxanium:wght@200..800&amp;display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Scripts -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/dashboard.js" defer></script>
+  <script src="/js/clients.js" defer></script>
+</head>
+<body>
+  <!-- ======== Header e Menu ======== -->
+  <div class="dashboard-container header-container">
+    <div>
+      <h1>Cartão Fidelidade</h1>
+      <p id="welcome-msg">
+        Olá, seja bem-vindo de volta, <span id="user-name"></span>!
+      </p>
+    </div>
+    <img id="logo" src="/logo/LogoGuerra.png" alt="Logo do estabelecimento" />
+  </div>
+
+  <nav class="tab-menu">
+    <!-- Botão “ativo” indica que estamos na seção Cadastrar Cliente -->
+    <button data-section="none">← Voltar</button>
+    <a href="index.html"><button>🏠 Dashboard</button></a>
+    <a href="clients.html"><button class="active">👤 Cadastrar Cliente</button></a>
+    <a href="addPoints.html"><button>➕ Adicionar Pontos</button></a>
+    <a href="clientsTable.html"><button>📋 Tabela Clientes</button></a>
+    <a href="notifications.html"><button>🔔 Notificações</button></a>
+    <a href="qr.html"><button>📷 Consultar Pontos</button></a>
+    <button id="logoutBtn" class="logout-btn">Sair</button>
+  </nav>
+
+  <!-- ======== Conteúdo “Cadastrar Cliente” ======== -->
+  <div class="dashboard-container">
+    <h3>Adicionar Novo Cliente</h3>
+    <label for="clientFullName">Nome Completo:</label>
+    <input
+      type="text"
+      id="clientFullName"
+      placeholder="Nome Completo do Cliente"
+    />
+    <label for="clientPhone">Número de Telefone:</label>
+    <input type="text" id="clientPhone" placeholder="Número de Telefone" />
+    <label for="clientEmail">Email:</label>
+    <input type="email" id="clientEmail" placeholder="Email do Cliente" />
+    <label for="clientPoints">Pontos:</label>
+    <input type="number" id="clientPoints" min="0" value="0" />
+    <button id="saveClientBtn">Salvar Cliente</button>
+  </div>
+
+  <footer>
+    <p>
+      &copy; Douglas Moraes Dev<br />
+      <a href="https://wa.me/qr/F2Z744R5KWEPB1" target="_blank"
+        >Contato</a
+      >
+    </p>
+  </footer>
+</body>
+</html>

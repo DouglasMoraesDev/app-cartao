@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- 1) meta theme-color com id para que o dashboard.js (ou theme.js) possa alterá-la dinamicamente -->
+  <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartão Fidelidade – Login</title>
+
+  <!-- 2) Manifest e ícones (todos apontam para /manifest.json e /logo/*) -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/logo/icon.png" sizes="192x192" />
+  <link rel="icon" href="/logo/icon.png" sizes="512x512" />
+  <link rel="apple-touch-icon" href="/logo/icon.png" sizes="180x180" />
+  <link rel="shortcut icon" href="/logo/icon.png" />
+
+  <!-- 3) CSS global (não mudamos nada em style.css) -->
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- 4) Fontes Google, exatamente como antes -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&amp;family=Oxanium:wght@200..800&amp;display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- 5) Script comum de API (api.js) e de login (login.js) -->
+  <!--    Usamos defer para garantir que o DOM já exista antes de rodar o script -->
+  <script src="/js/api.js" defer></script>
+  <script src="/js/login.js" defer></script>
+</head>
+<body>
+  <!-- ======= Conteriner de login (o CSS em #loginDiv continua o mesmo) ======= -->
+  <div class="container">
+    <div id="loginDiv">
+      <h2>Login</h2>
+      <label for="username">Usuário:</label>
+      <input type="text" id="username" placeholder="Digite seu nome de usuário" />
+      <label for="password">Senha:</label>
+      <input type="password" id="password" placeholder="Digite sua senha" />
+      <button id="loginBtn">Entrar</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      &copy; Douglas Moraes Dev<br />
+      <a href="https://wa.me/qr/F2Z744R5KWEPB1" target="_blank">Contato</a>
+    </p>
+  </footer>
+</body>
+</html>

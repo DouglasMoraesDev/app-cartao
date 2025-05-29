@@ -1,20 +1,26 @@
 {
-  "name": "Cartão Fidelidade BityLab",
+  "name": "Cartão Fidelidade",
   "short_name": "Fidelidade",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "/logo/Logo.png",
+      "src": "/logo/icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/logo/Logo.png",
+      "src": "/logo/icon.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/logo/icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
