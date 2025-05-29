@@ -263,6 +263,20 @@
   #sideMenu .logout-btn:hover {
     transform: translateY(-2px);
   }
+
+
+.qr-container {
+  display: flex;
+  justify-content: center; /* centraliza horizontalmente */
+  align-items: center;     /* (opcional) centraliza verticalmente */
+  /* defina altura/min-height se quiser controlar o eixo vertical */
+}
+.qr-container img {
+  max-width: 100%;
+  height: auto;
+}
+
+
   
   /* Footer sempre fixo no final */
   footer {
