@@ -1,15 +1,11 @@
-// public/js/qr.js
 /**
- * Se a página tiver elemento de QR Code, renderiza com ID da URL
+ * qr.js
+ * Extrai establishmentId da query string e monta QR + link
  */
 document.addEventListener('DOMContentLoaded', () => {
-  const qrImg = document.getElementById('qrCodeImg');
-  if (!qrImg) return;
-
-  // obtém establishmentId de query string
+  // obtém estId da URL (?establishmentId=123)
   const params = new URLSearchParams(window.location.search);
-  const estId  = params.get('establishmentId');
-  if (!estId) return;
-
+  const estId = params.get('establishmentId') || localStorage.getItem('currentEstablishmentId');
+  if (!estId) return alert('ID do estabelecimento não informado');
   renderQRCode(estId);
 });

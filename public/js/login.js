@@ -1,46 +1,36 @@
-// public/js/login.js
-
+/**
+ * login.js
+ * Controla o fluxo de login:
+ *  - faz POST para /api/login
+ *  - salva token + dados em localStorage
+ *  - redireciona para a página de cadastro (ou dashboard)
+ */
 document.addEventListener('DOMContentLoaded', () => {
-  const loginBtn   = document.getElementById('loginBtn');
-  const loginDiv   = document.getElementById('loginDiv');
-  const dashboard  = document.getElementById('dashboard');
-
-  // Se não houver dashboard nesta página, apenas oculta o guard
-  // (login.html não tem dashboard, então a segunda parte não roda)
-  if (!loginBtn || !loginDiv) return;
-
+  const loginBtn = document.getElementById('loginBtn');
   loginBtn.addEventListener('click', async () => {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
-
     if (!username || !password) {
       return alert('Preencha todos os campos!');
     }
-
     try {
-      const res  = await fetch(`${API_URL}/login`, {
+      const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
-        headers: { 'Content-Type':'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
       const data = await res.json();
-
       if (!res.ok) {
-        if (res.status === 402 && confirm(`${data.message}\nDeseja renovar?`)) {
-          return window.location.href = '/payment.html';
-        }
         return alert(data.message || 'Usuário ou senha inválidos');
       }
-
-      // Armazena dados para uso geral
+      // salva sessão
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('currentEstablishmentId', data.user.establishmentId);
       localStorage.setItem('userName', data.user.fullName || data.user.username);
-
-      // Redireciona para a dashboard
-      window.location.href = '/index.html';
+      // vai para a página de cadastro
+      window.location.href = '/cadastrar.html';
     } catch (err) {
-      console.error('Erro no login:', err);
+      console.error(err);
       alert('Erro no login. Tente novamente.');
     }
   });

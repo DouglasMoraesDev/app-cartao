@@ -1,126 +1,81 @@
 // public/js/dashboard.js
 /**
- * Inicialização geral após window.onload:
- *  - Verifica token/estId em localStorage
- *  - Busca dados do estabelecimento (tema, assinatura, logo)
- *  - Chama applyTheme, renderQRCode e exibe dashboard
- *  - Configura abas e listeners de cada módulo
+ * dashboard.js
+ * Inicialização comum para todas as páginas de dashboard:
+ *  - Verifica token e establishmentId em localStorage e redireciona para login.html se ausentes
+ *  - Busca dados do estabelecimento (tema, logo, assinatura)
+ *  - Aplica tema dinâmico via applyTheme
+ *  - Preenche nome do usuário e logo
+ *  - Verifica expiração de assinatura (28 dias) e redireciona para payment.html
  */
-window.onload = async () => {
+
+document.addEventListener('DOMContentLoaded', async () => {
   const token = localStorage.getItem('authToken');
   const estId = localStorage.getItem('currentEstablishmentId');
 
+  // Se não tiver token ou establishmentId, redireciona para login
   if (!token || !estId) {
-    // mostra apenas login
-    document.getElementById('loginDiv').style.display  = 'flex';
-    document.getElementById('dashboard').style.display = 'none';
-    return;
+    return window.location.href = '/login.html';
   }
 
   try {
-    // 1) busca dados do estabelecimento
+    // 1) Busca dados do estabelecimento
     const resEst = await apiFetch(
       `${API_URL}/establishments/${estId}`,
-      { headers:{ 'Authorization': `Bearer ${token}` } }
+      { headers: { 'Authorization': `Bearer ${token}` } }
     );
     const establishment = await resEst.json();
 
-    // 2) verifica validade de assinatura (28 dias)
-    const lastPay = establishment.lastPaymentDate
-      ? new Date(establishment.lastPaymentDate).getTime()
-      : 0;
-    if (!lastPay || Date.now() - lastPay > 28 * 24*60*60*1000) {
-      alert('Assinatura expirou. Renove para continuar.');
-      return window.location.href = '/payment.html';
+    // 2) Verifica validade de assinatura (28 dias)
+    if (establishment.lastPaymentDate) {
+      const lastPay = new Date(establishment.lastPaymentDate).getTime();
+      if (Date.now() - lastPay > 28 * 24 * 60 * 60 * 1000) {
+        alert('Assinatura expirou. Renove para continuar.');
+        return window.location.href = '/payment.html';
+      }
     }
 
-    // 3) aplica tema e logo
-applyTheme({
-  "primary-color":   establishment.primaryColor,
-  "secondary-color": establishment.secondaryColor,
-  "background-color": establishment.backgroundColor,
-  "container-bg":    establishment.containerBg,
-  "text-color":      establishment.textColor,
-  "header-bg":       establishment.headerBg,
-  "footer-bg":       establishment.footerBg,
-  "footer-text":     establishment.footerText,
-  "input-border":    establishment.inputBorder,
-  "button-bg":       establishment.buttonBg,
-  "button-text":     establishment.buttonText,
-  "section-margin":  establishment.sectionMargin
-});
+    // 3) Aplica tema dinâmico
+    applyTheme({
+      'primary-color':    establishment.primaryColor,
+      'secondary-color':  establishment.secondaryColor,
+      'background-color': establishment.backgroundColor,
+      'container-bg':     establishment.containerBg,
+      'text-color':       establishment.textColor,
+      'header-bg':        establishment.headerBg,
+      'footer-bg':        establishment.footerBg,
+      'footer-text':      establishment.footerText,
+      'input-border':     establishment.inputBorder,
+      'button-bg':        establishment.buttonBg,
+      'button-text':      establishment.buttonText,
+      'section-margin':   establishment.sectionMargin
+    });
 
-// Normalizar o caminho do logo
-const logoEl = document.getElementById('logo');
-if (establishment.logoURL) {
-  let logoPath = establishment.logoURL;
+    // 4) Atualiza meta theme-color
+    const meta = document.getElementById('theme-color-meta');
+    if (meta) {
+      meta.setAttribute('content', establishment.backgroundColor);
+    }
 
-// Se começar com "public/", removemos essa parte:
-  if (logoPath.startsWith('public/')) {
-    logoPath = logoPath.replace(/^public\//, '');
-  }
+    // 5) Preenche nome do usuário
+    const nameEl = document.getElementById('user-name');
+    if (nameEl) {
+      nameEl.textContent = localStorage.getItem('userName') || '';
+    }
 
-// Se não começar com "/", adicionamos a barra para virar caminho absoluto:
-  if (!logoPath.startsWith('/')) {
-    logoPath = '/' + logoPath;
-  }
-
-// Por fim, atribuímos o src ao <img>:
-  logoEl.src = logoPath;
-} else {
-  // Se não houver logoURL, use um ícone padrão (opcional):
-  logoEl.src = '/logo/icon.png';
-}
-document.getElementById('theme-color-meta').setAttribute('content', establishment.backgroundColor);
-
-
-    // 4) exibe dashboard
-    document.getElementById('loginDiv').style.display  = 'none';
-    document.getElementById('dashboard').style.display = 'flex';
-    document.getElementById('user-name').textContent   = localStorage.getItem('userName');
-    renderQRCode(estId);
-
-    // 5) configura abas
-    setupTabListeners();
-
-    // 6) carrega dados iniciais de clientes e demais módulos
-    await loadClients();
-    setupClientsListeners();
-    setupAddPointsListeners();
-    setupNotificationsListeners();
+    // 6) Normaliza e define logo
+    const logoEl = document.getElementById('logo');
+    if (logoEl) {
+      let logoPath = establishment.logoURL || '';
+      if (logoPath.startsWith('public/')) {
+        logoPath = logoPath.replace(/^public\//, '');
+      }
+      if (logoPath && !logoPath.startsWith('/')) {
+        logoPath = '/' + logoPath;
+      }
+      logoEl.src = logoPath || '/logo/icon.png';
+    }
   } catch (error) {
     console.error('Erro na inicialização:', error);
   }
-};
-
-/**
- * Configura troca de abas (mostra/oculta seções)
- */
-function setupTabListeners() {
-  const tabs = document.querySelectorAll('.tab-menu button');
-  tabs.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // ativa botão
-      tabs.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      // oculta todas as seções
-      document.querySelectorAll('.tab-content').forEach(sec => sec.style.display = 'none');
-      // exibe a selecionada
-      document.getElementById(btn.dataset.section).style.display = 'block';
-
-      // ações pós-troca
-      if (btn.dataset.section === 'tab-table') renderClientsList();
-      if (btn.dataset.section === 'tab-notify') loadNotifications();
-    });
-  });
-}
-
-/**
- * Logout simples: limpa tudo e mostra login
- */
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  localStorage.clear();
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('loginDiv').style.display  = 'flex';
-  alert('Logout realizado.');
 });

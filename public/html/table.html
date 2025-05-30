@@ -24,13 +24,13 @@
   <meta charset="UTF-8" />
   <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cartão Fidelidade – Consultar Pontos</title>
+  <title>Cartão Fidelidade – Tabela Clientes</title>
 
   <!-- 4) Scripts deferidos -->
   <script src="/js/api.js" defer></script>
   <script src="/js/theme.js" defer></script>
   <script src="/js/dashboard.js" defer></script>
-  <script src="/js/qr.js" defer></script>
+  <script src="/js/clients.js" defer></script>
 </head>
 <body>
   <!-- Cabeçalho -->
@@ -48,23 +48,27 @@
   <nav class="tab-menu">
     <a href="/cadastrar.html"><button>👤 Cadastrar</button></a>
     <a href="/addPoints.html"><button>➕ Adicionar Pontos</button></a>
-    <a href="/table.html"><button>📋 Clientes</button></a>
+    <a href="/table.html"><button class="active">📋 Clientes</button></a>
     <a href="/notify.html"><button>🔔 Notificações</button></a>
-    <a href="/qr.html"><button class="active">📷 Consultar</button></a>
+    <a href="/qr.html"><button>📷 Consultar</button></a>
     <a href="/login.html"><button>Sair</button></a>
   </nav>
 
   <!-- Conteúdo -->
-  <section class="dashboard-container qr-container">
-    <div>
-      <h3>QR Code para consulta</h3>
-      <img id="qrCodeImg" alt="QR Code" />
-      <p>
-        Ou abra direto: 
-        <a id="pointsLink" href="#" target="_blank">Meus Pontos</a>
-      </p>
-    </div>
+  <section class="dashboard-container">
+    <input type="text" id="searchClientsInput" placeholder="🔎 Pesquisar cliente..." />
+    <ul id="clientsList"></ul>
   </section>
+
+  <!-- Modal de detalhes -->
+  <div id="clientDetailCard">
+    <button id="closeDetailCard">✖</button>
+    <h3 id="detailName"></h3>
+    <p><strong>Email:</strong> <span id="detailEmail"></span></p>
+    <p><strong>Telefone:</strong> <span id="detailPhone"></span></p>
+    <p><strong>Pontos:</strong> <span id="detailPoints"></span></p>
+  </div>
+  <div id="detailBackdrop"></div>
 
   <footer>
     &copy; Douglas Moraes Dev — 

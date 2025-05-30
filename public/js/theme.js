@@ -1,20 +1,22 @@
-// public/js/theme.js
 /**
- * Aplica tema recebendo um objeto { "primary-color": "#...", ... }
+ * theme.js
+ * - applyTheme: aplica variáveis CSS dinâmicas
+ * - renderQRCode: monta QR + link (usado em qr.js)
  */
+
 function applyTheme(vars) {
-  Object.entries(vars).forEach(([key, value]) => {
-    document.documentElement.style.setProperty(`--${key}`, value);
+  Object.entries(vars).forEach(([key, val])=>{
+    document.documentElement.style.setProperty(`--${key}`, val);
   });
 }
 
-/**
- * Monta e exibe o QR Code para a aba de consulta
- * @param {string|number} estId 
- */
+// montamos a URL do QR + link
 function renderQRCode(estId) {
   const qrImg = document.getElementById('qrCodeImg');
   const link  = document.getElementById('pointsLink');
-  qrImg.src  = `${API_URL}/establishments/${estId}/qrcode`;
-  link.href = `${BASE_URL}/points.html?establishmentId=${estId}`;
+  if (qrImg) qrImg.src = `${API_URL}/establishments/${estId}/qrcode`;
+  if (link)  link.href = `${BASE_URL}/points.html?establishmentId=${estId}`;
 }
+
+// opcional: ao inicializar qualquer página, você pode buscar tema do estabelecimento:
+// fetch(`${API_URL}/establishments/${estId}`)... e chamar applyTheme(...)

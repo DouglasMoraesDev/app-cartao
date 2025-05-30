@@ -1,75 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
+  <!-- 1) Injeta tema do localStorage antes do CSS -->
+  <script>
+    (function() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('adminTheme') || '{}');
+        Object.entries(saved).forEach(([key, val]) => {
+          if (val) {
+            document.documentElement.style.setProperty(`--${key}`, val);
+          }
+        });
+      } catch (e) {
+        console.warn('Erro ao aplicar tema inicial:', e);
+      }
+    })();
+  </script>
 
-  <!-- meta theme-color -->
+  <!-- 2) Carrega o CSS usando as vars já injetadas -->
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- 3) Meta e título -->
+  <meta charset="UTF-8" />
   <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartão Fidelidade – Adicionar Pontos</title>
 
-  <!-- Manifest e ícones -->
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="icon" href="/logo/icon.png" sizes="192x192" />
-  <link rel="icon" href="/logo/icon.png" sizes="512x512" />
-  <link rel="apple-touch-icon" href="/logo/icon.png" sizes="180x180" />
-  <link rel="shortcut icon" href="/logo/icon.png" />
-
-  <!-- CSS global -->
-  <link rel="stylesheet" href="/css/style.css" />
-
-  <!-- Fontes Google -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&amp;family=Oxanium:wght@200..800&amp;display=swap"
-    rel="stylesheet"
-  />
-
-  <!-- Scripts -->
+  <!-- 4) Scripts deferidos -->
   <script src="/js/api.js" defer></script>
+  <script src="/js/theme.js" defer></script>
   <script src="/js/dashboard.js" defer></script>
   <script src="/js/addPoints.js" defer></script>
 </head>
 <body>
-  <!-- ======== Header e Menu ======== -->
-  <div class="dashboard-container header-container">
+  <!-- Cabeçalho -->
+  <header class="dashboard-container header-container">
     <div>
       <h1>Cartão Fidelidade</h1>
       <p id="welcome-msg">
         Olá, seja bem-vindo de volta, <span id="user-name"></span>!
       </p>
     </div>
-    <img id="logo" src="/logo/LogoGuerra.png" alt="Logo do estabelecimento" />
-  </div>
+    <img id="logo" src="" alt="Logo do estabelecimento" />
+  </header>
 
+  <!-- Menu de abas -->
   <nav class="tab-menu">
-    <a href="index.html"><button>🏠 Dashboard</button></a>
-    <a href="clients.html"><button>👤 Cadastrar Cliente</button></a>
-    <a href="addPoints.html"><button class="active">➕ Adicionar Pontos</button></a>
-    <a href="clientsTable.html"><button>📋 Tabela Clientes</button></a>
-    <a href="notifications.html"><button>🔔 Notificações</button></a>
-    <a href="qr.html"><button>📷 Consultar Pontos</button></a>
-    <button id="logoutBtn" class="logout-btn">Sair</button>
+    <a href="/cadastrar.html"><button>👤 Cadastrar</button></a>
+    <a href="/addPoints.html"><button class="active">➕ Adicionar Pontos</button></a>
+    <a href="/table.html"><button>📋 Clientes</button></a>
+    <a href="/notify.html"><button>🔔 Notificações</button></a>
+    <a href="/qr.html"><button>📷 Consultar</button></a>
+    <a href="/login.html"><button>Sair</button></a>
   </nav>
 
-  <!-- ======== Conteúdo “Adicionar Pontos” ======== -->
-  <div class="dashboard-container">
+  <!-- Conteúdo -->
+  <section class="dashboard-container">
     <h3>Adicionar Pontos</h3>
-    <input
-      type="text"
-      id="searchPointsInput"
-      placeholder="🔎 Pesquisar cliente..."
-    />
+    <input type="text" id="searchPointsInput" placeholder="🔎 Pesquisar cliente..." />
     <button id="searchPointsBtn">Buscar</button>
     <div id="addPointsCardContainer"></div>
-  </div>
+  </section>
 
   <footer>
-    <p>
-      &copy; Douglas Moraes Dev<br />
-      <a href="https://wa.me/qr/F2Z744R5KWEPB1" target="_blank"
-        >Contato</a
-      >
-    </p>
+    &copy; Douglas Moraes Dev — 
+    <a href="https://wa.me/qr/F2Z744R5KWEPB1" target="_blank">Contato</a>
   </footer>
 </body>
 </html>
