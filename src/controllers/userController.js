@@ -11,6 +11,24 @@ exports.login = async (req, res, next) => {
       req.body.username,
       req.body.password
     );
+
+    // Monta o objeto `theme` com as chaves em kebab-case, conforme seu CSS global espera:
+    const theme = {
+      'primary-color':    establishment.primaryColor,
+      'secondary-color':  establishment.secondaryColor,
+      'background-color': establishment.backgroundColor,
+      'container-bg':     establishment.containerBg,
+      'text-color':       establishment.textColor,
+      'header-bg':        establishment.headerBg,
+      'footer-bg':        establishment.footerBg,
+      'footer-text':      establishment.footerText,
+      'input-border':     establishment.inputBorder,
+      'button-bg':        establishment.buttonBg,
+      'button-text':      establishment.buttonText,
+      'section-margin':   establishment.sectionMargin,
+      'logoURL':          establishment.logoURL
+    };
+
     return res.json({
       success: true,
       message: 'Login bem-sucedido',
@@ -19,22 +37,9 @@ exports.login = async (req, res, next) => {
         id:              user.id,
         username:        user.username,
         fullName:        user.fullName,
-        establishmentId: user.establishmentId,
-        // tema
-        'primary-color':   establishment.primaryColor,
-        'secondary-color': establishment.secondaryColor,
-        'background-color':establishment.backgroundColor,
-        'container-bg':    establishment.containerBg,
-        'text-color':      establishment.textColor,
-        'header-bg':       establishment.headerBg,
-        'footer-bg':       establishment.footerBg,
-        'footer-text':     establishment.footerText,
-        'input-border':    establishment.inputBorder,
-        'button-bg':       establishment.buttonBg,
-        'button-text':     establishment.buttonText,
-        'section-margin':  establishment.sectionMargin,
-        logoURL:           establishment.logoURL
-      }
+        establishmentId: user.establishmentId
+      },
+      theme // ← devolve o objeto de tema separado, em kebab-case
     });
   } catch (error) {
     if (

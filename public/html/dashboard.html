@@ -1,57 +1,89 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  <!-- 0) Metas essenciais -->
   <meta charset="UTF-8" />
-  <meta name="theme-color" content="#ffffff" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cartão Fidelidade – Dashboard</title>
+  <meta id="theme-color-meta" name="theme-color" content="#ffffff" />
 
-  <!-- Mesmos links do login.html -->
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="icon" href="/logo/icon.png" sizes="192x192" />
-  <link rel="icon" href="/logo/icon.png" sizes="512x512" />
-  <link rel="apple-touch-icon" href="/logo/icon.png" sizes="180x180" />
-  <link rel="shortcut icon" href="/logo/icon.png" />
+  <!-- 1) Injeção de variáveis CSS ANTES de carregar o CSS global -->
+  <script>
+    (function () {
+      const raw = localStorage.getItem('themeVars');
+      if (raw) {
+        try {
+          const vars = JSON.parse(raw);
+          Object.entries(vars).forEach(([key, val]) => {
+            document.documentElement.style.setProperty(`--${key}`, val);
+          });
+          const meta = document.getElementById('theme-color-meta');
+          if (meta && vars['background-color']) {
+            meta.setAttribute('content', vars['background-color']);
+          }
+        } catch (e) {
+          console.warn('Erro ao aplicar themeVars:', e);
+        }
+      }
+    })();
+  </script>
+  <!-- ============================================================ -->
 
-  <link rel="stylesheet" href="/css/style.css">
+  <!-- 2) CSS GLOBAL (carregado só depois que as variáveis já estiverem injetadas) -->
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- 3) Fontes (se houver) -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&amp;family=Oxanium:wght@200..800&amp;display=swap"
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&family=Oxanium:wght@200..800&display=swap"
     rel="stylesheet"
   />
 
-  <!-- Scripts comuns e específicos -->
+  <!-- 4) Título da página -->
+  <title>Cartão Fidelidade – Dashboard</title>
+
+  <!-- 5) Scripts deferidos:
+         - primeiro api.js
+         - depois theme.js (para garantir que applyTheme exista)
+         - finalmente dashboard.js (que chama applyTheme) -->
   <script src="/js/api.js" defer></script>
+  <script src="/js/theme.js" defer></script>
   <script src="/js/dashboard.js" defer></script>
 </head>
 <body>
-  <!-- ====== Apenas o Dashboard (sem o loginDiv) ====== -->
+  <!-- ====== Dashboard (sem loginDiv) ====== -->
   <div id="dashboard">
     <!-- HEADER e boas-vindas -->
     <div class="dashboard-container header-container">
       <div>
         <h1>Cartão Fidelidade</h1>
-        <p id="welcome-msg">Olá, seja bem-vindo de volta, <span id="user-name"></span>!</p>
+        <p id="welcome-msg">
+          Olá, seja bem-vindo de volta, <span id="user-name"></span>!
+        </p>
       </div>
-      <img id="logo" src="/logo/LogoGuerra.png" alt="Logo do estabelecimento" />
+      <img id="logo" src="/logo/Logo.png" alt="Logo do estabelecimento" />
     </div>
 
     <!-- MENU DE ABAS -->
     <nav class="tab-menu">
-      <a href="clients.html"><button>👤 Cadastrar Cliente</button></a>
-      <a href="addPoints.html"><button>➕ Adicionar Pontos</button></a>
-      <a href="clientsTable.html"><button>📋 Tabela Clientes</button></a>
-      <a href="notifications.html"><button>🔔 Notificações</button></a>
-      <a href="qr.html"><button>📷 Consultar Pontos</button></a>
-      <a href="login.html"><button>Sair</button></a>
+      <a href="dashboard.html"><button>Painel ADMIN</button></a>
+      <a href="/cadastrar.html"><button>👤 Cadastrar Cliente</button></a>
+      <a href="/addPoints.html"><button>➕ Adicionar Pontos</button></a>
+      <a href="/table.html"><button>📋 Tabela Clientes</button></a>
+      <a href="/notify.html"><button>🔔 Notificações</button></a>
+      <a href="/qr.html"><button>📷 Consultar Pontos</button></a>
+      <a href="/login.html"><button>Sair</button></a>
     </nav>
 
-    <!-- Aqui poderíamos incluir, logo abaixo, um “<div id="content"></div>” caso
-         queiramos dinamicamente injetar conteúdo, mas a ideia geral é:
-         cada aba agora virou uma página diferente. -->
+    <!-- Espaço para conteúdo dinâmico, se necessário -->
+    <main class="dashboard-container">
+      <h2>Selecione uma aba para começar</h2>
+    </main>
   </div>
 
   <footer>
-    <p>&copy; Douglas Moraes Dev<br /><a href="https://wa.me/qr/F2Z744R5KWEPB1" target="_blank">Contato</a></p>
+    <p>
+      &copy; Douglas Moraes Dev<br />
+      <a href="https://wa.me/qr/F2Z744R5KWEPB1" target="_blank">Contato</a>
+    </p>
   </footer>
 </body>
 </html>

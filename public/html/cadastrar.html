@@ -1,34 +1,38 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <!-- 0) Esconde e 1) injeta tema + mostra logo imediatamente -->
-  <style> body { visibility: hidden; } </style>
+  <!-- 0) Metas essenciais -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta id="theme-color-meta" name="theme-color" content="#ffffff" />
+
+  <!-- 1) Injeção de variáveis CSS ANTES do CSS global -->
   <script>
-    (function() {
-      try {
-        const saved = JSON.parse(localStorage.getItem('adminTheme') || '{}');
-        Object.entries(saved).forEach(([key, val]) => {
-          if (val) document.documentElement.style.setProperty(`--${key}`, val);
-        });
-      } catch (e) {
-        console.warn('Erro ao aplicar tema inicial:', e);
+    (function () {
+      const raw = localStorage.getItem('themeVars');
+      if (raw) {
+        try {
+          const vars = JSON.parse(raw);
+          Object.entries(vars).forEach(([key, val]) => {
+            document.documentElement.style.setProperty(`--${key}`, val);
+          });
+          // Atualiza <meta name="theme-color">
+          const meta = document.getElementById('theme-color-meta');
+          if (meta && vars['background-color']) {
+            meta.setAttribute('content', vars['background-color']);
+          }
+        } catch (e) {
+          console.warn('Erro ao aplicar themeVars:', e);
+        }
       }
-      function show() {
-        document.body.style.visibility = 'visible';
-      }
-      if (document.body) show();
-      else document.addEventListener('DOMContentLoaded', show);
     })();
   </script>
+  <!-- ============================================================ -->
 
-  <!-- 2) CSS -->
+  <!-- 2) CSS GLOBAL (carregado só depois que as variáveis estiverem injetadas) -->
   <link rel="stylesheet" href="/css/style.css" />
 
-  <!-- 3) Meta e título -->
-  <meta charset="UTF-8" />
-  <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- 3) Título da página -->
   <title>Cartão Fidelidade – Cadastrar Cliente</title>
 
   <!-- 4) Scripts deferidos -->
@@ -36,9 +40,10 @@
   <script src="/js/theme.js" defer></script>
   <script src="/js/dashboard.js" defer></script>
   <script src="/js/clients.js" defer></script>
+  <script src="/js/cadastrar.js" defer></script>
 </head>
 <body>
-     <!-- Cabeçalho -->
+  <!-- Cabeçalho -->
   <header class="dashboard-container header-container">
     <div>
       <h1>Cartão Fidelidade</h1>
@@ -49,15 +54,16 @@
     <img id="logo" src="" alt="Logo do estabelecimento" />
   </header>
 
-  <!-- Menu de abas -->
-  <nav class="tab-menu">
-    <a href="/cadastrar.html"><button class="active">👤 Cadastrar</button></a>
-    <a href="/addPoints.html"><button>➕ Adicionar Pontos</button></a>
-    <a href="/table.html"><button>📋 Clientes</button></a>
-    <a href="/notify.html"><button>🔔 Notificações</button></a>
-    <a href="/qr.html"><button>📷 Consultar</button></a>
-    <a href="/login.html"><button>Sair</button></a>
-  </nav>
+    <!-- MENU DE ABAS -->
+    <nav class="tab-menu">
+      <a href="dashboard.html"><button>Painel ADMIN</button></a>
+      <a href="/cadastrar.html"><button>👤 Cadastrar Cliente</button></a>
+      <a href="/addPoints.html"><button>➕ Adicionar Pontos</button></a>
+      <a href="/table.html"><button>📋 Tabela Clientes</button></a>
+      <a href="/notify.html"><button>🔔 Notificações</button></a>
+      <a href="/qr.html"><button>📷 Consultar Pontos</button></a>
+      <a href="/login.html"><button>Sair</button></a>
+    </nav>
 
   <!-- Conteúdo -->
   <section class="dashboard-container">
@@ -74,7 +80,7 @@
   </section>
 
   <footer>
-    &copy; Douglas Moraes Dev — 
+    &copy; Douglas Moraes Dev —
     <a href="https://wa.me/qr/F2Z744R5KWEPB1" target="_blank">Contato</a>
   </footer>
 </body>
