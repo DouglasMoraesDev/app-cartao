@@ -1,24 +1,23 @@
-const BASE_URL = 'http://localhost:3000';
-const API_URL  = `${BASE_URL}/api`;
+// public/js/api.js
+// ------------------------------------------------------------
+// Define BASE_URL, API_URL e apiFetch como variáveis globais
+// para uso em todos os scripts sem módulos ES.
+// ------------------------------------------------------------
+;(function (global) {
+  // 1) URL base do seu servidor
+  global.BASE_URL = 'http://localhost:3000'
 
-/**
- * Wrapper fetch que:
- *  - trata 401 → redireciona ao login
- *  - trata 402 → redireciona ao payment
- */
-async function apiFetch(url, options = {}) {
-  const res = await fetch(url, options);
-  if (res.status === 401) {
-    alert('Sessão expirada. Faça login novamente.');
-    localStorage.clear();
-    window.location.href = '/login.html';
-    return;
+  // 2) API_URL aponta para todas as rotas que começam em "/api"
+  global.API_URL  = BASE_URL + '/api'
+
+  // 3) apiFetch: wrapper simples para fetch
+  global.apiFetch = async function (url, options = {}) {
+    try {
+      const res = await fetch(url, options)
+      return res
+    } catch (err) {
+      console.error('apiFetch error:', err)
+      throw err
+    }
   }
-  if (res.status === 402) {
-    alert('Assinatura expirada');
-    localStorage.clear();
-    window.location.href = '/payment.html';
-    return;
-  }
-  return res;
-}
+})(window)

@@ -3,29 +3,22 @@ const prisma = require('../config/db');
 
 /**
  * POST /api/clients/check-points
- * Retorna pontos de um cliente por telefone e estabelecimento
+ * Body: { phone, establishmentId }
+ * Retorna { points } do cliente ou 404 se não existir
  */
 exports.checkPoints = async (req, res, next) => {
   try {
     const { phone, establishmentId } = req.body;
-    if (!phone || !establishmentId) {
-      return res
-        .status(400)
-        .json({ message: 'phone e establishmentId são obrigatórios' });
-    }
-
     const estId = parseInt(establishmentId, 10);
+    if (!phone || !estId) {
+      return res.status(400).json({ message: 'phone e establishmentId são obrigatórios' });
+    }
     const client = await prisma.client.findFirst({
       where: { phone, establishmentId: estId },
-      select: { points: true },
     });
-
     if (!client) {
-      return res
-        .status(404)
-        .json({ message: 'Cliente não encontrado neste estabelecimento.' });
+      return res.status(404).json({ message: 'Cliente não encontrado' });
     }
-
     res.json({ points: client.points });
   } catch (error) {
     next(error);
@@ -33,18 +26,16 @@ exports.checkPoints = async (req, res, next) => {
 };
 
 /**
- * GET /api/clients?establishmentId=#
- * Lista todos os clientes de um estabelecimento
+ * GET /api/clients
+ * Query: ?establishmentId=
+ * Lista todos os clientes do estabelecimento
  */
 exports.listClients = async (req, res, next) => {
   try {
     const establishmentId = parseInt(req.query.establishmentId, 10);
     if (!establishmentId) {
-      return res
-        .status(400)
-        .json({ message: 'EstablishmentId é obrigatório' });
+      return res.status(400).json({ message: 'establishmentId é obrigatório' });
     }
-
     const clients = await prisma.client.findMany({
       where: { establishmentId },
     });
@@ -56,28 +47,42 @@ exports.listClients = async (req, res, next) => {
 
 /**
  * POST /api/clients
- * Cria um novo cliente
+ * Body: { fullName, phone, email, points, establishmentId }
  */
 exports.createClient = async (req, res, next) => {
   try {
-    const { fullName, phone, email, points, establishmentId } = req.body;
+    const { fullName, phone, email, points = 0, establishmentId } = req.body;
     const estId = parseInt(establishmentId, 10);
     if (!fullName || !phone || !estId) {
-      return res
-        .status(400)
-        .json({ message: 'fullName, phone e establishmentId são obrigatórios' });
+      return res.status(400).json({ message: 'fullName, phone e establishmentId são obrigatórios' });
     }
-
-    const newClient = await prisma.client.create({
-      data: {
-        fullName,
-        phone,
-        email,
-        points: points || 0,
-        establishmentId: estId,
-      },
+    const client = await prisma.client.create({
+      data: { fullName, phone, email, points, establishmentId: estId },
     });
-    res.status(201).json(newClient);
+    res.status(201).json(client);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /api/clients/:id
+ * Query: ?establishmentId=
+ */
+exports.getClient = async (req, res, next) => {
+  try {
+    const clientId = parseInt(req.params.id, 10);
+    const estId    = parseInt(req.query.establishmentId, 10);
+    if (!estId) {
+      return res.status(400).json({ message: 'establishmentId é obrigatório' });
+    }
+    const client = await prisma.client.findFirst({
+      where: { id: clientId, establishmentId: estId },
+    });
+    if (!client) {
+      return res.status(404).json({ message: 'Cliente não encontrado' });
+    }
+    res.json(client);
   } catch (error) {
     next(error);
   }
@@ -85,50 +90,43 @@ exports.createClient = async (req, res, next) => {
 
 /**
  * PUT /api/clients/:id
- * Atualiza dados de um cliente
+ * Body: { fullName, phone, email, points, establishmentId }
  */
 exports.updateClient = async (req, res, next) => {
   try {
     const clientId = parseInt(req.params.id, 10);
-    const { fullName, phone, email, points, establishmentId } = req.body;
+    const { fullName, phone, email, points = 0, establishmentId } = req.body;
     const estId = parseInt(establishmentId, 10);
-
     if (!fullName || !phone || !estId) {
-      return res
-        .status(400)
-        .json({ message: 'fullName, phone e establishmentId são obrigatórios' });
+      return res.status(400).json({ message: 'fullName, phone e establishmentId são obrigatórios' });
     }
-
-    const updatedClient = await prisma.client.update({
+    const updated = await prisma.client.update({
       where: { id: clientId },
-      data: {
-        fullName,
-        phone,
-        email,
-        points,
-        establishmentId: estId,
-      },
+      data: { fullName, phone, email, points, establishmentId: estId },
     });
-    res.json({ message: 'Cliente atualizado', client: updatedClient });
+    res.json(updated);
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * DELETE /api/clients/:id?establishmentId=#
- * Exclui um cliente
+ * DELETE /api/clients/:id
+ * Query: ?establishmentId=
  */
 exports.deleteClient = async (req, res, next) => {
   try {
     const clientId = parseInt(req.params.id, 10);
     const estId     = parseInt(req.query.establishmentId, 10);
     if (!estId) {
-      return res
-        .status(400)
-        .json({ message: 'EstablishmentId é obrigatório' });
+      return res.status(400).json({ message: 'establishmentId é obrigatório' });
     }
-
+    const client = await prisma.client.findFirst({
+      where: { id: clientId, establishmentId: estId },
+    });
+    if (!client) {
+      return res.status(404).json({ message: 'Cliente não encontrado' });
+    }
     await prisma.client.delete({ where: { id: clientId } });
     res.json({ message: 'Cliente excluído' });
   } catch (error) {
@@ -138,31 +136,20 @@ exports.deleteClient = async (req, res, next) => {
 
 /**
  * POST /api/clients/:id/points
- * Adiciona pontos a um cliente
+ * Body: { pointsToAdd }
  */
 exports.addPoints = async (req, res, next) => {
   try {
-    const clientId = parseInt(req.params.id, 10);
-    const { pointsToAdd, establishmentId } = req.body;
-    const estId = parseInt(establishmentId, 10);
-    if (!estId) {
-      return res
-        .status(400)
-        .json({ message: 'EstablishmentId é obrigatório' });
+    const clientId     = parseInt(req.params.id, 10);
+    const { pointsToAdd } = req.body;
+    if (typeof pointsToAdd !== 'number') {
+      return res.status(400).json({ message: 'pointsToAdd numérico é obrigatório' });
     }
-
-    const client = await prisma.client.findUnique({ where: { id: clientId } });
-    if (!client || client.establishmentId !== estId) {
-      return res
-        .status(404)
-        .json({ message: 'Cliente não encontrado para este estabelecimento' });
-    }
-
-    const updatedClient = await prisma.client.update({
+    const client = await prisma.client.update({
       where: { id: clientId },
-      data: { points: client.points + pointsToAdd },
+      data: { points: { increment: pointsToAdd } },
     });
-    res.json({ message: 'Pontos adicionados', client: updatedClient });
+    res.json(client);
   } catch (error) {
     next(error);
   }
@@ -175,26 +162,11 @@ exports.addPoints = async (req, res, next) => {
 exports.resetClientPoints = async (req, res, next) => {
   try {
     const clientId = parseInt(req.params.id, 10);
-    const { establishmentId } = req.body;
-    const estId = parseInt(establishmentId, 10);
-    if (!estId) {
-      return res
-        .status(400)
-        .json({ message: 'EstablishmentId é obrigatório' });
-    }
-
-    const client = await prisma.client.findUnique({ where: { id: clientId } });
-    if (!client || client.establishmentId !== estId) {
-      return res
-        .status(404)
-        .json({ message: 'Cliente não encontrado para este estabelecimento' });
-    }
-
-    const updatedClient = await prisma.client.update({
+    const client = await prisma.client.update({
       where: { id: clientId },
       data: { points: 0 },
     });
-    res.json({ message: 'Pontos zerados com sucesso.', client: updatedClient });
+    res.json(client);
   } catch (error) {
     next(error);
   }

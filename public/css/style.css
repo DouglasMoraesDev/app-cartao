@@ -109,6 +109,26 @@
   .tab-menu button.active {
     border-color: var(--primary-color);
   }
+
+  /* Metrics cards */
+.metrics-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: var(--section-margin) 0;
+}
+.metric-card {
+  flex: 1;
+  min-width: 200px;
+  background: var(--primary-color);
+  color: var(--background-color);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: var(--box-shadow);
+}
+.metric-card h2 { margin-bottom: 0.5rem; font-size: 1.1rem; }
+.metric-card p  { font-size: 2rem; font-weight: bold; }
   
   /* Conteúdo de abas */
   .tab-content {

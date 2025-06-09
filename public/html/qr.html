@@ -6,17 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta id="theme-color-meta" name="theme-color" content="#ffffff" />
 
-  <!-- 1) Injeção de variáveis CSS ANTES do CSS global -->
+  <!-- 1) Injeção de CSS variável -->
   <script>
     (function () {
       const raw = localStorage.getItem('themeVars');
       if (raw) {
         try {
           const vars = JSON.parse(raw);
-          Object.entries(vars).forEach(([key, val]) => {
-            document.documentElement.style.setProperty(`--${key}`, val);
+          Object.entries(vars).forEach(([k, v]) => {
+            document.documentElement.style.setProperty(`--${k}`, v);
           });
-          // Atualiza <meta name="theme-color">
           const meta = document.getElementById('theme-color-meta');
           if (meta && vars['background-color']) {
             meta.setAttribute('content', vars['background-color']);
@@ -27,49 +26,53 @@
       }
     })();
   </script>
-  <!-- ============================================================ -->
 
-  <!-- 2) CSS GLOBAL (carregado só depois que as variáveis estiverem injetadas) -->
+  <!-- 2) CSS global -->
   <link rel="stylesheet" href="/css/style.css" />
 
-  <!-- 3) Título da página -->
   <title>Cartão Fidelidade – Consultar Pontos</title>
 
-  <!-- 4) Scripts deferidos -->
-  <script src="/js/api.js" defer></script>
+  <!-- 3) Scripts deferidos -->
+  <script src="/js/api.js"   defer></script>
   <script src="/js/theme.js" defer></script>
-  <script src="/js/qr.js" defer></script>
+  <script src="/js/dashboard.js" defer></script>  <!-- ← aqui! -->
+  <script src="/js/qr.js"    defer></script>
 </head>
 <body>
-  <div class="points-container">
-    <header>
-      <!-- Logo do estabelecimento, definido dinamicamente pelo theme.js ou dashboard.js -->
-      <img id="est-logo" alt="Logo do estabelecimento" />
-      <!-- Nome da página ou do estabelecimento -->
-      <h1 id="est-name">Consultar Pontos</h1>
+  <!-- Cabeçalho comum -->
+  <header class="dashboard-container header-container">
+    <div>
+      <h1>Cartão Fidelidade</h1>
+      <p id="welcome-msg">
+        Olá, seja bem-vindo de volta, <span id="user-name"></span>!
+      </p>
+    </div>
+    <img id="logo" src="" alt="Logo do estabelecimento" />
+  </header>
 
-      <!-- MENU DE ABAS -->
-      <nav class="tab-menu">
-        <a href="dashboard.html"><button>Painel ADMIN</button></a>
-        <a href="/cadastrar.html"><button>👤 Cadastrar Cliente</button></a>
-        <a href="/addPoints.html"><button>➕ Adicionar Pontos</button></a>
-        <a href="/table.html"><button>📋 Tabela Clientes</button></a>
-        <a href="/notify.html"><button>🔔 Notificações</button></a>
-        <a href="/qr.html"><button class="active">📷 Consultar Pontos</button></a>
-        <a href="/login.html"><button>Sair</button></a>
-      </nav>
+  <!-- Menu de abas -->
+  <nav class="tab-menu">
+    <a href="/dashboard.html"><button>Painel ADMIN</button></a>
+    <a href="/cadastrar.html"><button>👤 Cadastrar Cliente</button></a>
+    <a href="/addPoints.html"><button>➕ Adicionar Pontos</button></a>
+    <a href="/table.html"><button>📋 Tabela Clientes</button></a>
+    <a href="/notify.html"><button>🔔 Notificações</button></a>
+    <a href="/qr.html"><button class="active">📷 Consultar Pontos</button></a>
+    <a href="/login.html"><button>Sair</button></a>
+  </nav>
+
+  <!-- Conteúdo específico -->
+  <section class="dashboard-container points-container">
+    <header>
     </header>
 
-    <!-- Área do QR Code -->
     <div class="card-wrapper">
-      <!-- A imagem do QR será gerada dinamicamente por theme.js → renderQRCode() -->
       <img id="qrCodeImg" alt="QR Code para este estabelecimento" />
     </div>
 
-    <!-- Link para abertura do cartão de pontos (página points.html?establishmentId=…) -->
     <div class="card-wrapper">
       <a id="pointsLink" href="#" target="_blank">Ir para meu Cartão de Pontos</a>
     </div>
-  </div>
+  </section>
 </body>
 </html>

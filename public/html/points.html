@@ -16,7 +16,25 @@
     href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap"
     rel="stylesheet"
   />
-
+  <script>
+    (function () {
+      const raw = localStorage.getItem('themeVars');
+      if (raw) {
+        try {
+          const vars = JSON.parse(raw);
+          Object.entries(vars).forEach(([key, val]) => {
+            document.documentElement.style.setProperty(`--${key}`, val);
+          });
+          const meta = document.getElementById('theme-color-meta');
+          if (meta && vars['background-color']) {
+            meta.setAttribute('content', vars['background-color']);
+          }
+        } catch (e) {
+          console.warn('Erro ao aplicar themeVars:', e);
+        }
+      }
+    })();
+  </script>
   <!-- 3) CSS global (caminho corrigido para /css/style.css) -->
   <link rel="stylesheet" href="/css/style.css" />
 
@@ -189,7 +207,7 @@
     <div id="cardContainer">
       <!-- ... seu cartão virtual ... -->
       <div class="qr-container">
-        <img src="/logo/qrcode.png" alt="QR Code do Estabelecimento" />
+
       </div>
     </div>
   </div>
